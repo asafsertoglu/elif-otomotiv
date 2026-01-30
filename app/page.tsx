@@ -1,11 +1,38 @@
-import { getActiveVehicles } from '@/lib/db'
+'use client'
+
+import { useEffect, useState } from 'react'
 import VehicleList from '@/components/VehicleList'
 import { Car } from 'lucide-react'
+import type { Vehicle } from '@/lib/db'
 
-export const dynamic = 'force-dynamic'
+export default function Home() {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [loading, setLoading] = useState(true)
 
-export default async function Home() {
-  const vehicles = await getActiveVehicles()
+  useEffect(() => {
+    async function fetchVehicles() {
+      try {
+        const res = await fetch('/api/vehicles')
+        const data = await res.json()
+        const activeVehicles = data.filter((v: Vehicle) => v.status === 'active')
+        setVehicles(activeVehicles)
+      } catch (error) {
+        console.error('Araçlar yüklenemedi:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchVehicles()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
+        <div className="text-amber-500 text-2xl">Yükleniyor...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
