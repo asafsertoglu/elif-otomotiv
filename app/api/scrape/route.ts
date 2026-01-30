@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
-    // ÖNEMLİ: Bu basit bir örnek
-    // Gerçek scraping için Puppeteer veya Sahibinden API gerekli
-    
-    // Örnek mock veri (test için)
+    // Mock veri (test için)
     const mockVehicles = [
       {
         title: '2019 Volkswagen Passat 1.6 TDI Comfortline',
@@ -29,14 +28,12 @@ export async function GET() {
     let updatedCount = 0
 
     for (const vehicle of mockVehicles) {
-      // Bu scrape_id'ye sahip araç var mı kontrol et
       const [existing] = await pool.query(
         'SELECT id FROM vehicles WHERE scrape_id = ?',
         [vehicle.scrape_id]
       )
 
       if ((existing as any[]).length === 0) {
-        // Yoksa ekle
         await pool.query(
           `INSERT INTO vehicles (title, price, year, km, fuel, brand, model, images, whatsapp, source, status, scrape_id, description)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -58,7 +55,6 @@ export async function GET() {
         )
         addedCount++
       } else {
-        // Varsa güncelle (fiyat değişmiş olabilir)
         await pool.query(
           'UPDATE vehicles SET price = ?, km = ? WHERE scrape_id = ?',
           [vehicle.price, vehicle.km, vehicle.scrape_id]
