@@ -6,19 +6,29 @@ export async function GET() {
     const vehicles = await getAllVehicles()
     return NextResponse.json(vehicles)
   } catch (error) {
-    console.error('Veritabanı hatası:', error)
-    return NextResponse.json({ error: 'Araçlar yüklenemedi' }, { status: 500 })
+    console.error('API Veritabanı hatası:', error)
+    return NextResponse.json({ 
+      error: 'Araçlar yüklenemedi',
+      message: error instanceof Error ? error.message : 'Bilinmeyen hata'
+    }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
+    console.log('API POST - Gelen veri:', data)
+    
     const id = await createVehicle(data)
+    console.log('API POST - Oluşturulan ID:', id)
+    
     return NextResponse.json({ success: true, id })
   } catch (error) {
-    console.error('Araç ekleme hatası:', error)
-    return NextResponse.json({ error: 'Araç eklenemedi' }, { status: 500 })
+    console.error('API Araç ekleme hatası:', error)
+    return NextResponse.json({ 
+      error: 'Araç eklenemedi',
+      message: error instanceof Error ? error.message : 'Bilinmeyen hata'
+    }, { status: 500 })
   }
 }
 
